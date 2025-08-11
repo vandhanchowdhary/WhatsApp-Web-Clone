@@ -43,6 +43,8 @@ const io = new Server(server, {
     origin: [
       "http://localhost:5173",
       "https://whats-app-web-clone-alpha.vercel.app",
+      "https://whats-app-web-clone-ntq8hxv7k-vandhanchowdharys-projects.vercel.app",
+      "https://whats-app-web-clone-git-main-vandhanchowdharys-projects.vercel.app",
     ],
     methods: ["GET", "POST"],
   },
