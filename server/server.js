@@ -14,11 +14,15 @@ const server = http.createServer(app);
 
 app.use(
   cors({
-    origin: ["http://localhost:5173"], // same as above
+    origin: [
+      "http://localhost:5173", // local dev frontend
+      "https://whats-app-web-clone-alpha.vercel.app", // Deployed frontend URL
+    ],
     methods: ["GET", "POST"],
     credentials: true,
   })
 );
+
 
 app.use(express.json());
 
@@ -36,13 +40,16 @@ try {
 // Socket.IO setup
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: [
+      "http://localhost:5173",
+      "https://whats-app-web-clone-alpha.vercel.app",
+    ],
     methods: ["GET", "POST"],
   },
   transports: ["websocket"],
 });
 
-
+// Log Socket.IO connections
 io.on("connection", (socket) => {
   console.log("🔌 Client connected:", socket.id);
   socket.on("disconnect", () => {
