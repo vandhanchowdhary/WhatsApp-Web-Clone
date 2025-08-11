@@ -51,12 +51,12 @@ io.on("connection", (socket) => {
 });
 
 // Webhook endpoint
-app.post("/webhook", async (req, res) => {
+app.post('/webhook', async (req, res) => {
   try {
     const changes = req.body?.metaData?.entry?.[0]?.changes?.[0]?.value;
 
     if (!changes) {
-      return res.status(400).json({ ok: false, msg: "Invalid payload format" });
+      return res.status(400).json({ ok: false, msg: 'Invalid payload format' });
     }
 
     // Handle messages
@@ -64,8 +64,21 @@ app.post("/webhook", async (req, res) => {
       for (const m of changes.messages) {
         const contact = changes.contacts?.[0] || {};
         const wa_id = contact.wa_id || m.from;
-        const contact_name = contact.profile?.name || null;
-        const direction = m.from === wa_id ? "inbound" : "outbound";
+
+        // Try getting the contact name from payload
+        let contact_name = contact.profile?.name || null;
+
+        // If no name in payload, check DB for an existing name for this wa_id
+        if (!contact_name) {
+          const existing = await Message.findOne({ wa_id })
+            .sort({ timestamp: -1 })
+            .lean();
+          if (existing?.contact_name) {
+            contact_name = existing.contact_name;
+          }
+        }
+
+        const direction = m.from === wa_id ? 'inbound' : 'outbound';
 
         const msgData = {
           wa_id,
@@ -73,11 +86,11 @@ app.post("/webhook", async (req, res) => {
           from: m.from,
           msg_id: m.id,
           meta_msg_id: m.id,
-          text: m.text?.body || "",
+          text: m.text?.body || '',
           timestamp: new Date(Number(m.timestamp) * 1000),
           direction,
-          status: "received",
-          raw: req.body,
+          status: 'received',
+          raw: req.body
         };
 
         await Message.updateOne(
@@ -86,7 +99,7 @@ app.post("/webhook", async (req, res) => {
           { upsert: true }
         );
 
-        io.emit("message:new", msgData);
+        io.emit('message:new', msgData);
       }
     }
 
@@ -103,10 +116,10 @@ app.post("/webhook", async (req, res) => {
         );
 
         if (updated) {
-          io.emit("message:status", {
+          io.emit('message:status', {
             msg_id: meta_id,
             status: newStatus,
-            wa_id: updated.wa_id,
+            wa_id: updated.wa_id
           });
         }
       }
@@ -114,7 +127,7 @@ app.post("/webhook", async (req, res) => {
 
     res.json({ ok: true });
   } catch (err) {
-    console.error("Webhook error:", err);
+    console.error('Webhook error:', err);
     res.status(500).json({ ok: false, error: err.message });
   }
 });
@@ -173,7 +186,7 @@ app.get("/api/messages/:wa_id", async (req, res) => {
 });
 
 // Send a demo message (store only, no external send)
-app.post("/api/messages/:wa_id/send", async (req, res) => {
+app.post('/api/messages/:wa_id/send', async (req, res) => {
   try {
     const { wa_id } = req.params;
     const { text } = req.body;
@@ -181,10 +194,19 @@ app.post("/api/messages/:wa_id/send", async (req, res) => {
       return res.status(400).json({ error: "Message text is required" });
     }
 
+    // Fetch the latest contact name for the present wa_id
+    let contact_name = null;
+    const lastMsg = await Message.findOne({ wa_id, contact_name: { $ne: null } })
+                                 .sort({ timestamp: -1 })
+                                 .lean();
+    if (lastMsg?.contact_name) {
+      contact_name = lastMsg.contact_name;
+    }
+
     const id = `local-${Date.now()}`;
     const msgData = {
       wa_id,
-      contact_name: null,
+      contact_name, // use stored name if available
       from: process.env.BUSINESS_NUMBER || "BUSINESS",
       msg_id: id,
       meta_msg_id: id,
@@ -192,12 +214,12 @@ app.post("/api/messages/:wa_id/send", async (req, res) => {
       timestamp: new Date(),
       direction: "outbound",
       status: "sent",
-      raw: {},
+      raw: {}
     };
 
     const msg = await Message.create(msgData);
 
-    io.emit("message:new", msgData); // Notify all clients in real time
+    io.emit('message:new', msgData); // Notify all clients in real time
 
     res.json(msg);
   } catch (err) {
@@ -205,6 +227,7 @@ app.post("/api/messages/:wa_id/send", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 // Health check
 app.get("/health", (req, res) => {

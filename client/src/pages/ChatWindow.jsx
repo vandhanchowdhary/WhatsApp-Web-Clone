@@ -61,11 +61,16 @@ export default function ChatWindow({ wa_id }) {
     // let server/socket handle adding the new message
   }
 
+  // Get contact name from the first message if available
+  const contactName = messages.length > 0 ? messages[0].contact_name : "";
+
   return (
     <div className="flex flex-col flex-1">
       {/* Header */}
       <div className="p-3 border-b bg-gray-100">
-        <h2 className="font-semibold">{wa_id}</h2>
+        <h2 className="font-semibold">
+          {contactName ? `${contactName} (${wa_id})` : wa_id}
+        </h2>
       </div>
 
       {/* Messages */}
