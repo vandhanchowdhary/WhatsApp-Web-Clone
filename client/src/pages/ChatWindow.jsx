@@ -4,7 +4,7 @@ import MessageBubble from "../components/MessageBubble";
 import SendBox from "../components/SendBox";
 import SocketContext from "../context/SocketContext";
 
-export default function ChatWindow({ wa_id }) {
+export default function ChatWindow({ wa_id, goBack }) {
   const [messages, setMessages] = useState([]);
   const socket = useContext(SocketContext);
   const listRef = useRef();
@@ -56,32 +56,34 @@ export default function ChatWindow({ wa_id }) {
     };
   }, [socket, wa_id]);
 
-  // no local push here to avoid duplicates
-  function handleMessageSent() {
-    // let server/socket handle adding the new message
-  }
-
   // Get contact name from the first message if available
   const contactName = messages.length > 0 ? messages[0].contact_name : "";
 
-  return (
-    <div className="flex flex-col flex-1">
-      {/* Header */}
-      <div className="p-3 border-b bg-gray-100">
-        <h2 className="font-semibold">
-          {contactName ? `${contactName} (${wa_id})` : wa_id}
-        </h2>
-      </div>
-
-      {/* Messages */}
-      <div ref={listRef} className="flex-1 p-3 overflow-y-auto bg-gray-50">
-        {messages.map((msg) => (
-          <MessageBubble key={msg.msg_id} message={msg} />
-        ))}
-      </div>
-
-      {/* Send box */}
-      <SendBox wa_id={wa_id} onMessageSent={handleMessageSent} />
+return (
+  <div className="flex flex-col flex-1">
+    {/* Header */}
+    <div className="p-3 border-b bg-gray-100 flex items-center gap-2">
+      {/* Back button only visible on mobile/tablet */}
+      <button
+        onClick={goBack}
+        className="md:hidden text-gray-600 hover:text-black"
+      >
+        ⬅
+      </button>
+      <h2 className="font-semibold truncate">
+        {contactName ? `${contactName} (${wa_id})` : wa_id}
+      </h2>
     </div>
-  );
+
+    {/* Messages */}
+    <div ref={listRef} className="flex-1 p-3 overflow-y-auto bg-green-50">
+      {messages.map((msg) => (
+        <MessageBubble key={msg.msg_id} message={msg} />
+      ))}
+    </div>
+
+    {/* Send box */}
+    <SendBox wa_id={wa_id} onMessageSent={() => {}} />
+  </div>
+);
 }

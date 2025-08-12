@@ -17,6 +17,9 @@ app.use(
     origin: [
       "http://localhost:5173", // local dev frontend
       "https://whats-app-web-clone-alpha.vercel.app", // Deployed frontend URL
+      "https://whats-app-web-clone-ntq8hxv7k-vandhanchowdharys-projects.vercel.app",
+      "https://whats-app-web-clone-git-main-vandhanchowdharys-projects.vercel.app",
+      "https://whats-app-web-clone-vandhanchowdharys-projects.vercel.app/",
     ],
     methods: ["GET", "POST"],
     credentials: true,
@@ -45,6 +48,7 @@ const io = new Server(server, {
       "https://whats-app-web-clone-alpha.vercel.app",
       "https://whats-app-web-clone-ntq8hxv7k-vandhanchowdharys-projects.vercel.app",
       "https://whats-app-web-clone-git-main-vandhanchowdharys-projects.vercel.app",
+      "https://whats-app-web-clone-vandhanchowdharys-projects.vercel.app/",
     ],
     methods: ["GET", "POST"],
   },

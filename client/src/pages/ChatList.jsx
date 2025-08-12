@@ -61,7 +61,7 @@ export default function ChatList({ selectChat, selected }) {
   }
 
   return (
-    <div className="w-full md:w-1/3 lg:w-1/4 bg-gray-100 border-r overflow-y-auto overflow-x-hidden">
+    <div className="w-full bg-gray-100 overflow-y-auto overflow-x-hidden">
       {conversations.map((conv) => (
         <div
           key={conv.wa_id}
@@ -71,7 +71,7 @@ export default function ChatList({ selectChat, selected }) {
           }`}
         >
           <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-white text-lg font-bold">
-            {conv.contact_name?.charAt(0) || conv.wa_id.slice(-2)}
+            <p className="m-6">{conv.contact_name?.charAt(0) || conv.wa_id.slice(-2)}</p>
           </div>
           <div className="flex-1 ml-3 w-[80%]">
             <div className="flex justify-between">

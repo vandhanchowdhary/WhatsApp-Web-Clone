@@ -24,7 +24,7 @@ export default function SendBox({ wa_id, onMessageSent }) {
     >
       <input
         type="text"
-        className="flex-1 p-2 rounded border border-gray-300"
+        className="flex-1 p-2 rounded border bg-green-50 border-gray-300"
         placeholder="Type a message"
         value={text}
         onChange={(e) => setText(e.target.value)}
