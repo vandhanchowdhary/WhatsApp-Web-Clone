@@ -59,31 +59,33 @@ export default function ChatWindow({ wa_id, goBack }) {
   // Get contact name from the first message if available
   const contactName = messages.length > 0 ? messages[0].contact_name : "";
 
-return (
-  <div className="flex flex-col flex-1">
-    {/* Header */}
-    <div className="p-3 border-b bg-gray-100 flex items-center gap-2">
-      {/* Back button only visible on mobile/tablet */}
-      <button
-        onClick={goBack}
-        className="md:hidden text-gray-600 hover:text-black"
+  return (
+    <div className="flex flex-col flex-1 h-full">
+      {/* Header */}
+      <div className="p-3 border-b-1 border-gray-600 flex items-center gap-2 flex-shrink-0">
+        <button
+          onClick={goBack}
+          className="md:hidden text-gray-600 hover:text-black"
+        >
+          ⬅
+        </button>
+        <h2 className="font-semibold truncate">
+          {contactName ? `${contactName} (${wa_id})` : wa_id}
+        </h2>
+      </div>
+      {/* Messages */}
+      <div
+        ref={listRef}
+        className="flex-1 p-3 overflow-y-auto bg-green-50 min-h-0"
       >
-        ⬅
-      </button>
-      <h2 className="font-semibold truncate">
-        {contactName ? `${contactName} (${wa_id})` : wa_id}
-      </h2>
+        {messages.map((msg) => (
+          <MessageBubble key={msg.msg_id} message={msg} />
+        ))}
+      </div>
+      {/* Send box */}
+      <div className="flex-shrink-0">
+        <SendBox wa_id={wa_id} onMessageSent={() => {}} />
+      </div>
     </div>
-
-    {/* Messages */}
-    <div ref={listRef} className="flex-1 p-3 overflow-y-auto bg-green-50">
-      {messages.map((msg) => (
-        <MessageBubble key={msg.msg_id} message={msg} />
-      ))}
-    </div>
-
-    {/* Send box */}
-    <SendBox wa_id={wa_id} onMessageSent={() => {}} />
-  </div>
-);
+  );
 }
